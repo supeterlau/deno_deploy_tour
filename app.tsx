@@ -3,11 +3,17 @@ import { h, ssr, tw } from "https://crux.land/nanossr@0.0.1";
 
 function handler(req: Request): Response {
   const url = new URL(req.url);
-  console.log("URL: ", url);
-  const name = url.searchParams.get("name") ?? "Deno";
-  console.log("name: ", name);
-  // return new Response("Deno Deploy");
-  return ssr(() => <Front nmae={name} />);
+  switch (url.pathname) {
+    case "front":
+      console.log("URL: ", url);
+      const name = url.searchParams.get("name") ?? "Deno";
+      console.log("name: ", name);
+      return ssr(() => <Front name={name} />);
+      break;
+    default:
+      return new Response("Deno Deploy");
+      break;
+  }
 }
 
 const Front = (props) => (
