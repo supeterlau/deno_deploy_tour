@@ -3,6 +3,7 @@ import { h, ssr, tw } from "https://crux.land/nanossr@0.0.1";
 
 function handler(req: Request): Response {
   const url = new URL(req.url);
+  console.log("path: ", url.pathname);
   switch (url.pathname) {
     case "front":
       console.log("URL: ", url);
