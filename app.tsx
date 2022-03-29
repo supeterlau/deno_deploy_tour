@@ -24,7 +24,7 @@ function handler(req: Request): Response {
       }
       messages.push(message);
       channel.postMessage(message);
-      return new Response("message sent.");
+      return new Response("message sent." + message);
     case "/messages":
       return new Response(JSON.stringify(messages), {
         "content-type": "application/json",
