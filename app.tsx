@@ -5,7 +5,7 @@ function handler(req: Request): Response {
   const url = new URL(req.url);
   console.log("path: ", url.pathname);
   switch (url.pathname) {
-    case "front":
+    case "/front":
       console.log("URL: ", url);
       const name = url.searchParams.get("name") ?? "Deno";
       console.log("name: ", name);
