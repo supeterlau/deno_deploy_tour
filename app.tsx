@@ -52,7 +52,7 @@ const ask = async (url: string) => {
   try {
     const res = await fetch(url)
     console.log(res)
-    return await res.json()
+    return await res.text()
   } catch(err){
     console.error(err)
     return JSON.stringify(err)
@@ -71,7 +71,7 @@ router.get("/proxy", async (ctx) => {
   // res.body = { hello: "oak" };
 
 res.body = content
-  res.type = "json";
+  res.type = "text";
   res.status = Status.OK;
 });
 

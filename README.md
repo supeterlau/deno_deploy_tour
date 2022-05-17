@@ -1,5 +1,7 @@
 Deno Deploy App
 
+cheap-snake-68.deno.dev
+
 Local Development:
 
 yarn dev
