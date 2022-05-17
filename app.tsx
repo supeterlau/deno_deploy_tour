@@ -1,47 +1,87 @@
-import { serve } from "https://deno.land/std@0.114.0/http/server.ts";
-import { h, ssr, tw } from "https://crux.land/nanossr@0.0.1";
+import { h, renderSSR, Helmet } from "./deps.ts";
+import { Status, Application, Router } from "./deps.ts";
 
-const messages = [];
+import { SubApp } from "./components/SubApp.tsx";
 
-const channel = new BroadcastChannel("chat");
-channel.onmessage = (event) => {
-  messages.push(event.data);
-};
+// import { createRequire } from "https://deno.land/std@0.139.0/node/module.ts";
 
-function handler(req: Request): Response {
-  const url = new URL(req.url);
-  console.log("path: ", url.pathname);
-  switch (url.pathname) {
-    case "/front":
-      console.log("URL: ", url);
-      const name = url.searchParams.get("name") ?? "Deno";
-      console.log("name: ", name);
-      return ssr(() => <Front name={name} />);
-    case "/send":
-      const message = url.searchParams.get("msg");
-      if (!message) {
-        return new Response("?msg not provided", { status: 400 });
-      }
-      messages.push(message);
-      channel.postMessage(message);
-      return new Response("message sent." + message);
-    case "/messages":
-      return new Response(JSON.stringify(messages), {
-        "content-type": "application/json",
-      });
-    default:
-      return new Response("Deno Deploy");
-  }
-}
+// const require = createRequire(import.meta.url);
+// console.log(new URL("http://example.com/a/b?q=c"));
 
-const Front = (props) => (
-  <div class={tw`bg-white flex h-screen`}>
-    <h3 class={tw`text-5xl text-gray-600 m-auto mt-20`}>
-      Welcome to {props.name} !
-    </h3>
+const App = () => (
+  <div>
+    <Helmet>
+      <html lang="en" amp />
+      <title>Nano App</title>
+      <meta name="description" content="Server Side Rendered Nano JSX App" />
+    </Helmet>
+
+    <SubApp />
+    <Helmet footer>
+      <script src="/scripts.js"></script>
+    </Helmet>
+    <h1>Yep</h1>
   </div>
 );
 
-console.log("Listening on http://localhost:8000");
+const ssr = renderSSR(<App />);
+const { body, head, footer, attributes } = Helmet.SSR(ssr);
 
-await serve(handler);
+const html = `
+<!DOCTYPE html>
+<html ${attributes.html.toString()}>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+${head.join("\n")}
+</head>
+<body ${attributes.body.toString()}>
+${body}
+${footer.join("\n")}
+</body>
+</html>
+`;
+
+const router = new Router();
+
+router.get("/", (ctx) => {
+  ctx.response.body = html;
+});
+
+const ask = async (url: string) => {
+  try {
+    const res = await fetch(url)
+    console.log(res)
+    return await res.json()
+  } catch(err){
+    console.error(err)
+    return JSON.stringify(err)
+  }
+}
+router.get("/proxy", async (ctx) => {
+  const {response: res, request: req} = ctx
+  const toUrl = (new URLSearchParams(req.url.search)).get('to') || "www.baidu.com"
+  console.log(toUrl)
+  const content = await ask(toUrl)
+  
+  // const match = req.url.match(/\?to=(.*)/)
+  //if(match){
+  //  console.log(`To: ${match[1]}`)
+  // }
+  // res.body = { hello: "oak" };
+
+res.body = content
+  res.type = "json";
+  res.status = Status.OK;
+});
+
+const app = new Application();
+
+app.use(router.routes());
+app.use(router.allowedMethods());
+
+app.addEventListener("listen", ({ port }) => {
+  console.log(`Deno App Listening on: http://localhost:${port}`);
+});
+
+await app.listen({ port: 5000 });

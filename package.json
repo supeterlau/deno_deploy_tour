@@ -1,0 +1,13 @@
+{
+  "name": "deno_deploy_tour",
+  "scripts": {
+    "vendor": "deno vendor ./app.tsx",
+    "dev": "deno run -A --import-map vendor/import_map.json --allow-net=:5000 --config tsconfig.json --watch -r ./app.tsx",
+    "dev-remot": "deno run --allow-net=:5000 --config tsconfig.json --watch ./app.tsx"
+  },
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:supeterlau/deno_deploy_tour.git",
+  "author": "Peter Lau <superpeterlau@outlook.com>",
+  "license": "MIT"
+}
