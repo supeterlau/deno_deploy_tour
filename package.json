@@ -3,8 +3,9 @@
   "scripts": {
     "vendor": "deno vendor ./app.tsx",
     "play": "deno run -A --import-map vendor/import_map.json --config tsconfig.json",
+    "start": "deno run -A --allow-net=:5000 --config tsconfig.json --watch -r ./app.tsx",
     "dev": "deno run -A --import-map vendor/import_map.json --allow-net=:5000 --config tsconfig.json --watch -r ./app.tsx",
-    "dev-remot": "deno run --allow-net=:5000 --config tsconfig.json --watch ./app.tsx"
+    "dev-remote": "deno run --allow-net=:5000 --config tsconfig.json --watch ./app.tsx"
   },
   "version": "1.0.0",
   "main": "index.js",
